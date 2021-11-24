@@ -11,6 +11,7 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 45)
+
     private String email;
 
     @Column(nullable = false, length = 64)
@@ -18,6 +19,27 @@ public class User {
 
     @Column(name = "username", nullable = false, length = 20)
     private String username;
+
+    @Column(name = "verification_code", length = 64)
+    private String verificationCode;
+
+    private boolean enabled;
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public Long getId() {
         return id;
