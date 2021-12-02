@@ -1,5 +1,7 @@
 package com.example.sap_project.model;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import javax.persistence.*;
 
 @Entity
@@ -24,6 +26,17 @@ public class User {
     private String verificationCode;
 
     private boolean enabled;
+
+    @ColumnDefault("false")
+    private boolean isAdmin;
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
 
     public String getVerificationCode() {
         return verificationCode;

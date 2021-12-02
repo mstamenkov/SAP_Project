@@ -6,6 +6,7 @@ import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -61,12 +64,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepo.findByEmail(username);
-        if (user == null) {
+        if (user == null) { //to do read for optional
             throw new UsernameNotFoundException("User not found");
         }
         return new UserDetailsImpl(user);
     }
 
+    @Async
     public void register(User user, String siteURL)
             throws UnsupportedEncodingException, MessagingException {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
@@ -94,6 +98,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             return true;
         }
 
+    }
+
+    public boolean verifyEmail(User user) {
+        Pattern pattern = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
+        Matcher matcher = pattern.matcher(user.getEmail());
+        System.out.println(user.getEmail() + " " + matcher.matches());
+        return matcher.matches();
     }
 
 }

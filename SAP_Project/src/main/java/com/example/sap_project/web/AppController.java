@@ -9,12 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Controller
 public class AppController {
@@ -38,14 +37,14 @@ public class AppController {
     }
 
     @PostMapping("/process_register")
-    public String processRegister(User user, HttpServletRequest request) throws UnsupportedEncodingException, MessagingException {
-        Pattern pattern = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
-        Matcher matcher = pattern.matcher(user.getEmail());
-        System.out.println(user.getEmail() + " " + matcher.matches());
-        if (matcher.matches()) {
+    public String processRegister(User user, HttpServletRequest request, RedirectAttributes redirAttrs) throws UnsupportedEncodingException, MessagingException {
+        if (service.verifyEmail(user)) {
             service.register(user, getSiteURL(request));
             return "register_success";
-        } else return "redirect:/register";
+        } else {
+            redirAttrs.addFlashAttribute("error", "Invalid email. Please check you email and try again.");
+            return "redirect:/register";
+        }
     }
 
     private String getSiteURL(HttpServletRequest request) {
