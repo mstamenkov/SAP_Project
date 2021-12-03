@@ -24,22 +24,17 @@ public class Offer {
     @Column(nullable = false)
     private String description;
 
-    private Integer phone;
+    private int phone;
 
-    public Date getDateOfExpiry() {
-        return dateOfExpiry;
+    @Column(nullable = false)
+    private String user;
+
+    public Long getId() {
+        return id;
     }
 
-    public void setDateOfExpiry(Date dateOfExpiry) {
-        this.dateOfExpiry = dateOfExpiry;
-    }
-
-    public int getPhone() {
-        return phone;
-    }
-
-    public void setPhone(int phone) {
-        this.phone = phone;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -66,6 +61,14 @@ public class Offer {
         this.dateOfCreation = dateOfCreation;
     }
 
+    public Date getDateOfExpiry() {
+        return dateOfExpiry;
+    }
+
+    public void setDateOfExpiry(Date dateOfExpiry) {
+        this.dateOfExpiry = dateOfExpiry;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -74,11 +77,19 @@ public class Offer {
         this.description = description;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public int getPhone() {
+        return phone;
     }
 
-    public Long getId() {
-        return id;
+    public void setPhone(int phone) {
+        this.phone = phone;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 }

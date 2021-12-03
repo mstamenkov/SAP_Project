@@ -1,8 +1,10 @@
 package com.example.sap_project.model;
 
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -13,7 +15,6 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 45)
-
     private String email;
 
     @Column(nullable = false, length = 64)
@@ -29,6 +30,26 @@ public class User {
 
     @ColumnDefault("false")
     private boolean isAdmin;
+
+    @OneToMany
+    @Cascade(org.hibernate.annotations.CascadeType.DELETE)
+    private List<Offer> entityList;
+
+    public List<Offer> getEntityList() {
+        return entityList;
+    }
+
+    public void setEntityList(List<Offer> entityList) {
+        this.entityList = entityList;
+    }
+
+    public void addOffer(Offer offer) {
+        entityList.add(offer);
+    }
+
+    public void removeOffer(Offer offer) {
+        entityList.remove(offer);
+    }
 
     public boolean isAdmin() {
         return isAdmin;

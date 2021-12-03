@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
+</head>
+
+<body>
+<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Sign Out"/>
+</form>
+<div class="container my-2">
+    <div class="card">
+        <div class="card-body">
+            <div th:switch="${offers}" class="container my-5">
+                <p class="my-5">
+                    <a href="/create" class="btn btn-primary">
+                        <i class="fas fa-user-plus ml-2"> Add Offer </i></a>
+                </p>
+                <div class="col-md-12">
+                    <h2 th:case="null">No record found !!</h2>
+                    <div th:case="*">
+                        <table class="table table-striped table-responsive-md">
+                            <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>User</th>
+                                <th>Phone</th>
+                                <!--                                <th>Edit download link</th>-->
+                                <!--                                <th>Edit</th>-->
+                                <!--                                <th>Delete</th>-->
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="offer : ${offers}">
+                                <td>
+                                    <a th:text="${offer.title}" class="btn btn-primary">
+                                        <i class="fas fa-user-edit ml-2"></i>
+                                    </a>
+                                </td>
+                                <td th:text="${offer.description}"></td>
+                                <td th:text="${offer.user}"></td>
+                                <td th:text="${offer.phone}"></td>
+                                <!--                                <td>-->
+                                <!--                                    <a th:href="@{/edit/{id}(id=${offer.id})}" class="btn btn-primary">-->
+                                <!--                                        <i class="fas fa-user-edit ml-2"></i>-->
+                                <!--                                    </a>-->
+                                <!--                                </td>-->
+                                <!--                                <td>-->
+                                <!--                                    <a th:href="@{/downloadLink/{id}(id=${offer.id})}" class="btn btn-primary">-->
+                                <!--                                        <i class="fas fa-user-edit ml-2"></i>-->
+                                <!--                                    </a>-->
+                                <!--                                </td>-->
+
+                            </tr>
+                            </tbody>
+                        </table>
+
+
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

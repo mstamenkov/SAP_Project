@@ -1,9 +1,11 @@
 package com.example.sap_project.service;
 
+import com.example.sap_project.exception.RegistrationException;
 import com.example.sap_project.model.User;
 import com.example.sap_project.repository.UserRepository;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
@@ -34,8 +37,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private void sendVerificationEmail(User user, String siteURL)
             throws MessagingException, UnsupportedEncodingException {
         String toAddress = user.getEmail();
-        String fromAddress = "noreply@localhost.com";
-        String senderName = "TEST";
         String subject = "Please verify your registration";
         String content = "Dear [[name]],<br>"
                 + "Please click the link below to verify your registration:<br>"
@@ -46,7 +47,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
-        helper.setFrom(fromAddress, senderName);
+        helper.setFrom(new InternetAddress("noreply@localhost.com", "noreply"));
         helper.setTo(toAddress);
         helper.setSubject(subject);
 
@@ -72,7 +73,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Async
     public void register(User user, String siteURL)
-            throws UnsupportedEncodingException, MessagingException {
+            throws UnsupportedEncodingException, MessagingException, RegistrationException {
+        if (userRepo.findByEmail(user.getEmail()) != null)
+            throw new RegistrationException("This email is already used");
+        if (userRepo.findByUsername(user.getUsername()) != null)
+            throw new RegistrationException("This username is already used");
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
@@ -80,9 +85,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         user.setVerificationCode(randomCode);
         user.setEnabled(false);
 
-        userRepo.save(user);
+        try {
+            sendVerificationEmail(user, siteURL);
+            userRepo.save(user);
+        } catch (MailAuthenticationException e) {
+            throw new RegistrationException("There is a problem with registration service in this moment. Please try again later.");
+        }
 
-        sendVerificationEmail(user, siteURL);
     }
 
     public boolean verify(String verificationCode) {
@@ -106,5 +115,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         System.out.println(user.getEmail() + " " + matcher.matches());
         return matcher.matches();
     }
-
 }
