@@ -24,8 +24,8 @@ public class OfferService {
     @Autowired
     HttpServletRequest servletRequest;
 
-    public void addOffer(Offer offer) {
-        if (offer.getUser() == null) {
+    public void addUpdateOffer(Offer offer) {
+        if (offer.getUser().isEmpty()) {
             User user = userRepo.findByUsername(servletRequest.getRemoteUser());
             offer.setUser(servletRequest.getRemoteUser());
             offer.setDateOfCreation(new Date(System.currentTimeMillis()));
@@ -36,12 +36,13 @@ public class OfferService {
             offerRepo.save(offer);
             userRepo.save(user);
         } else {
+            if (offer.isActive()) {
+                offer.setDateOfExpiry(null);
+            } else {
+                offer.setDateOfExpiry(new Date(System.currentTimeMillis()));
+            }
             offerRepo.save(offer);
         }
-    }
-
-    public void editOffer(Offer offer) {
-
     }
 
     public Offer getOfferById(Long id) throws RecordNotFoundException {
@@ -58,5 +59,18 @@ public class OfferService {
         ArrayList<Offer> offers = (ArrayList<Offer>) offerRepo.findAll();
         offers.removeIf(offer -> offer.isActive() != isActive);
         return offers;
+    }
+
+    public boolean ownerCheck(long id) {
+        Offer offer = offerRepo.getById(id);
+        return (offer.getUser().equals(servletRequest.getRemoteUser()));
+    }
+
+    public void deleteOffer(long id) {
+        Offer offer = offerRepo.getById(id);
+        User user = userRepo.findByUsername(offer.getUser());
+        user.removeOffer(offer);
+        userRepo.save(user);
+        offerRepo.deleteOfferById(offer.getId());
     }
 }

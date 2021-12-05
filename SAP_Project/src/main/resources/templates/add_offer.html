@@ -12,7 +12,7 @@
 
 <body>
 <div class="container my-5">
-    <h3> Add Offer</h3>
+    <h3> Add/Edit Offer</h3>
     <div class="card">
         <div class="card-body">
             <div class="col-md-10">
@@ -33,23 +33,26 @@
                         <div class="form-group col-md-8">
                             <label for="email" class="col-form-label">phone</label>
                             <input type="text" th:field="*{phone}" class="form-control"
-                                   id="email" placeholder="Folder"/>
+                                   id="email1" placeholder="Folder"/>
                         </div>
 
                         <div class="form-group col-md-8" th:if="${offer.user != null}">
-                            <label for="email" class="col-form-label">isActive</label>
-                            <input type="text" th:field="*{active}" class="form-control"
-                                   id="email" placeholder="Folder"/>
+                            <label for="isActive" class="col-form-label">isActive</label>
+                            <select name="isActive" id="isActive" th:field="*{active}">
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
                         </div>
 
                         <div class="col-md-6">
                             <input type="submit" class="btn btn-primary" value=" Submit ">
                         </div>
 
-                        <input type="hidden" id="id" th:field="*{id}">
-                        <input type="hidden" id="id2" th:field="*{dateOfCreation}">
-                        <!--                            <input type="hidden" id="id3" th:field="*{dateOfExpiry}">-->
-                        <input type="hidden" id="id4" th:field="*{user}">
+                        <input type="hidden" id="user" th:field="*{user}">
+                        <input type="hidden" id="id4" th:field="*{id}">
+                        <input type="hidden" id="doc" th:if="${offer.dateOfCreation != null}"
+                               th:field="*{dateOfCreation}">
+                        <input type="hidden" id="dox" th:if="${offer.dateOfExpiry != null}" th:field="*{dateOfExpiry}">
 
                     </div>
                 </form>

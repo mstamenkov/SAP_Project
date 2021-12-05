@@ -37,6 +37,9 @@ public class AppController {
     @Autowired
     private OfferService offerService;
 
+    @Autowired
+    HttpServletRequest servletRequest;
+
     @GetMapping("")
     public String viewHomePage() {
         return "index";
@@ -46,20 +49,36 @@ public class AppController {
     @PostMapping("/create")
     public String createOffer(Offer offerEntity) {
         System.out.println(offerEntity.getPhone() + offerEntity.getDescription());
-        offerService.addOffer(offerEntity);
+        offerService.addUpdateOffer(offerEntity);
         return "redirect:/home";
     }
 
     @GetMapping(path = {"/create", "/create/{id}"})
-    public String createOffer(Model model, @PathVariable("id") Optional<Long> id) throws RecordNotFoundException {
+    public String createOffer(Model model, @PathVariable("id") Optional<Long> id, RedirectAttributes redirAttrs) throws RecordNotFoundException {
         if (id.isPresent()) {
-            model.addAttribute("offer", offerService.getOfferById(id.get()));
-            return "add_offer";
+            if (offerService.ownerCheck(id.get())) {
+                model.addAttribute("offer", offerService.getOfferById(id.get()));
+            } else {
+                redirAttrs.addFlashAttribute("error", "Unknown offer id");
+                return "redirect:/home";
+            }
         } else {
             model.addAttribute("offer", new Offer());
-            return "add_offer";
         }
+        return "add_offer";
+    }
 
+    @GetMapping("/myoffers")
+    public String listOffers(Model model) {
+        User user = userRepo.findByUsername(servletRequest.getRemoteUser());
+        model.addAttribute("offers", user.getEntityList());
+        return "list_offers";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteOffer(@PathVariable("id") long id) {
+        offerService.deleteOffer(id);
+        return "redirect:/myoffers";
     }
 
 

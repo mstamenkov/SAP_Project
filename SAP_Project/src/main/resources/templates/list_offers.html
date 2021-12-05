@@ -20,10 +20,8 @@
         <div class="card-body">
             <div th:switch="${offers}" class="container my-5">
                 <p class="my-5">
-                    <a href="/create" class="btn btn-primary">
-                        <i class="fas fa-cart-plus ml-2"> Add Offer </i></a>
-                    <a href="/myoffers" class="btn btn-primary">
-                        <i class="fas fa-address-book ml-2"> My Offers </i></a>
+                    <a href="/home" class="btn btn-primary">
+                        <i class="fas fa-home ml-2"> Home </i></a>
                 </p>
                 <div class="col-md-12">
                     <h2 th:case="null">No record found !!</h2>
@@ -36,7 +34,7 @@
                                 <th>Description</th>
                                 <th>User</th>
                                 <th>Phone</th>
-                                <!--                                <th>Edit download link</th>-->
+                                <th>isActive</th>
                                 <!--                                <th>Edit</th>-->
                                 <!--                                <th>Delete</th>-->
                             </tr>
@@ -44,16 +42,18 @@
                             <tbody>
                             <tr th:each="offer : ${offers}">
                                 <td>
-                                    <a th:text="${offer.title}" class="btn btn-primary">
+                                    <a th:href="@{/create/{id}(id=${offer.id})}" th:text="${offer.title}"
+                                       class="btn btn-primary">
                                         <i class="fas fa-user-edit ml-2"></i>
                                     </a>
                                 </td>
                                 <td th:text="${offer.description}"></td>
                                 <td th:text="${offer.user}"></td>
                                 <td th:text="${offer.phone}"></td>
+                                <td th:text="${offer.active}"></td>
                                 <td>
-                                    <a th:href="@{}" class="btn btn-primary">
-                                        <i class="fas fa-heart ml-2"></i>
+                                    <a th:href="@{/delete/{id}(id=${offer.id})}" class="btn btn-primary">
+                                        <i class="fas fa-trash ml-2"></i>
                                     </a>
                                 </td>
                                 <!--                                <td>-->
