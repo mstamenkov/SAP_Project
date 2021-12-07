@@ -29,6 +29,18 @@ public class Offer {
     @Column(nullable = false)
     private String user;
 
+    @Column(nullable = false)
+    private double price;
+
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
     public Long getId() {
         return id;
     }

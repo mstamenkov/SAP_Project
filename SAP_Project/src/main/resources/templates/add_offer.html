@@ -19,21 +19,27 @@
                 <form action="#" th:action="@{/create}" th:object="${offer}" method="post">
                     <div class="row">
                         <div class="form-group col-md-8">
-                            <label for="email" class="col-form-label">Title</label>
+                            <label for="title" class="col-form-label">Title</label>
                             <input th:field="*{title}" type="text" class="form-control"
-                                   id="fname" placeholder="Folder name" name="folderName"/>
+                                   id="title" placeholder="Folder name" name="Title"/>
                         </div>
 
                         <div class="form-group col-md-8">
-                            <label for="name" class="col-form-label">Description</label>
+                            <label for="description" class="col-form-label">Description</label>
                             <input type="text" th:field="*{description}" class="form-control"
-                                   id="name" placeholder="Name"/>
+                                   id="description" placeholder="Description"/>
                         </div>
 
                         <div class="form-group col-md-8">
-                            <label for="email" class="col-form-label">phone</label>
-                            <input type="text" th:field="*{phone}" class="form-control"
-                                   id="email1" placeholder="Folder"/>
+                            <label for="price" class="col-form-label">Price</label>
+                            <input type="number" step="0.01" min="0" th:field="*{price}" class="form-control"
+                                   id="price" placeholder="Name"/>
+                        </div>
+
+                        <div class="form-group col-md-8">
+                            <label for="phone" class="col-form-label">phone</label>
+                            <input type="tel" th:field="*{phone}" class="form-control"
+                                   id="phone" placeholder="Phone"/>
                         </div>
 
                         <div class="form-group col-md-8" th:if="${offer.user != null}">

@@ -19,7 +19,7 @@
     <div class="card">
         <div class="card-body">
             <div th:switch="${offers}" class="container my-5">
-                <h2>My offers</h2>
+                <h2>Favorites</h2>
                 <p class="my-5">
                     <a href="/home" class="btn btn-primary">
                         <i class="fas fa-home ml-2"> Home </i></a>
@@ -44,7 +44,7 @@
                             <tbody>
                             <tr th:each="offer : ${offers}">
                                 <td>
-                                    <a th:href="@{/create/{id}(id=${offer.id})}" th:text="${offer.title}"
+                                    <a th:text="${offer.title}"
                                        class="btn btn-primary">
                                         <i class="fas fa-user-edit ml-2"></i>
                                     </a>
@@ -53,10 +53,9 @@
                                 <td th:text="${offer.user}"></td>
                                 <td th:text="${offer.phone}"></td>
                                 <td th:text="${offer.price}"></td>
-                                <td th:if="${offer.active}" th:text="Active"></td>
-                                <td th:unless="${offer.active}" th:text="Inactive"></td>
+                                <td th:text="${offer.active}"></td>
                                 <td>
-                                    <a th:href="@{/delete/{id}(id=${offer.id})}" class="btn btn-primary">
+                                    <a th:href="@{/rfav/{id}(id=${offer.id})}" class="btn btn-primary">
                                         <i class="fas fa-trash ml-2"></i>
                                     </a>
                                 </td>

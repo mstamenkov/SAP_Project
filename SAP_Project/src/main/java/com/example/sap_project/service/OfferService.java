@@ -1,16 +1,24 @@
 package com.example.sap_project.service;
 
 import com.example.sap_project.exception.RecordNotFoundException;
+import com.example.sap_project.exception.UserException;
 import com.example.sap_project.model.Offer;
 import com.example.sap_project.model.User;
 import com.example.sap_project.repository.OfferRepository;
 import com.example.sap_project.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,6 +31,9 @@ public class OfferService {
 
     @Autowired
     HttpServletRequest servletRequest;
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     public void addUpdateOffer(Offer offer) {
         if (offer.getUser().isEmpty()) {
@@ -72,5 +83,53 @@ public class OfferService {
         user.removeOffer(offer);
         userRepo.save(user);
         offerRepo.deleteOfferById(offer.getId());
+    }
+
+    public void addRemoveFavorite(Offer offer, boolean remove) throws UserException {
+        User user = userRepo.findByUsername(servletRequest.getRemoteUser());
+        if (remove) {
+            user.removeFavorite(offer);
+            userRepo.save(user);
+        } else {
+            if (!user.isFavoritePresent(offer) && !offer.getUser().equals(user.getUsername())) {
+                user.addFavorite(offer);
+                userRepo.save(user);
+                try {
+                    sendFavEmail(offer);
+                } catch (MessagingException | UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            } else throw new UserException("cant add offer to fav");
+        }
+    }
+
+    public List<Offer> getFavoriteOffers() {
+        User user = userRepo.findByUsername(servletRequest.getRemoteUser());
+        return user.getFavoritesList();
+    }
+
+    private void sendFavEmail(Offer offer)
+            throws MessagingException, UnsupportedEncodingException {
+        User user = userRepo.findByUsername(offer.getUser());
+        String toAddress = user.getEmail();
+        String subject = "Added offer to Favorite";
+        String content = "Dear [[name]],<br>"
+                + "Your offer for [[offerTitle]] was added to Favorite<br>"
+                + "Lorem Ipsum";
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        helper.setFrom(new InternetAddress("noreply@localhost.com", "noreply"));
+        helper.setTo(toAddress);
+        helper.setSubject(subject);
+
+        content = content.replace("[[name]]", user.getUsername());
+        content = content.replace("[[offerTitle]]", offer.getTitle());
+
+        helper.setText(content, true);
+
+        mailSender.send(message);
+
     }
 }

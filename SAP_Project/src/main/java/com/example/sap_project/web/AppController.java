@@ -2,6 +2,7 @@ package com.example.sap_project.web;
 
 import com.example.sap_project.exception.RecordNotFoundException;
 import com.example.sap_project.exception.RegistrationException;
+import com.example.sap_project.exception.UserException;
 import com.example.sap_project.model.Offer;
 import com.example.sap_project.model.User;
 import com.example.sap_project.repository.OfferRepository;
@@ -81,6 +82,30 @@ public class AppController {
         return "redirect:/myoffers";
     }
 
+    @GetMapping("/favorite/{id}")
+    public String addFavorite(@PathVariable("id") long id, RedirectAttributes redirAttrs) throws RecordNotFoundException {
+        try {
+            offerService.addRemoveFavorite(offerService.getOfferById(id), false);
+        } catch (UserException e) {
+            redirAttrs.addFlashAttribute("error", e.getMessage());
+            return "redirect:/home";
+        }
+        redirAttrs.addFlashAttribute("success", "fav added");
+        return "redirect:/home";
+    }
+
+    @GetMapping("/rfav/{id}")
+    public String removeFavorite(@PathVariable("id") long id, Model model, RedirectAttributes redirAttrs) throws RecordNotFoundException, UserException {
+        offerService.addRemoveFavorite(offerService.getOfferById(id), true);
+        redirAttrs.addFlashAttribute("error", "fav removed");
+        return "redirect:/myfav";
+    }
+
+    @GetMapping("/myfav")
+    public String listFavorite(Model model) {
+        model.addAttribute("offers", offerService.getFavoriteOffers());
+        return "favorites";
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////
 

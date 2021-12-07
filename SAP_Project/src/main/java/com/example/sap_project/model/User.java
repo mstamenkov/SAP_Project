@@ -35,6 +35,30 @@ public class User {
     @Cascade(org.hibernate.annotations.CascadeType.DELETE)
     private List<Offer> entityList;
 
+    @OneToMany
+    @Cascade(org.hibernate.annotations.CascadeType.DELETE)
+    private List<Offer> favoritesList;
+
+    public List<Offer> getFavoritesList() {
+        return favoritesList;
+    }
+
+    public void setFavoritesList(List<Offer> favoritesList) {
+        this.favoritesList = favoritesList;
+    }
+
+    public void addFavorite(Offer offer) {
+        favoritesList.add(offer);
+    }
+
+    public void removeFavorite(Offer offer) {
+        favoritesList.remove(offer);
+    }
+
+    public boolean isFavoritePresent(Offer offer) {
+        return favoritesList.contains(offer);
+    }
+
     public List<Offer> getEntityList() {
         return entityList;
     }
