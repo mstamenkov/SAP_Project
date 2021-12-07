@@ -58,7 +58,8 @@
                                 <td th:text="${offer.phone}"></td>
                                 <td th:text="${offer.price}"></td>
                                 <td>
-                                    <a th:href="@{/favorite/{id}(id=${offer.id})}" class="btn btn-primary">
+                                    <a th:if="${offer.user != #httpServletRequest.remoteUser}"
+                                       th:href="@{/favorite/{id}(id=${offer.id})}" class="btn btn-primary">
                                         <i class="fas fa-heart ml-2"></i>
                                     </a>
                                 </td>

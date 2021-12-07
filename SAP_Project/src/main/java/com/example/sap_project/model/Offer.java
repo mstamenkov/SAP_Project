@@ -24,7 +24,8 @@ public class Offer {
     @Column(nullable = false)
     private String description;
 
-    private int phone;
+    @Column(length = 15)
+    private String phone;
 
     @Column(nullable = false)
     private String user;
@@ -89,11 +90,11 @@ public class Offer {
         this.description = description;
     }
 
-    public int getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(int phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 

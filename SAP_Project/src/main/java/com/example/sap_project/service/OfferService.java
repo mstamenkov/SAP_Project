@@ -9,6 +9,7 @@ import com.example.sap_project.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -85,22 +86,18 @@ public class OfferService {
         offerRepo.deleteOfferById(offer.getId());
     }
 
-    public void addRemoveFavorite(Offer offer, boolean remove) throws UserException {
-        User user = userRepo.findByUsername(servletRequest.getRemoteUser());
-        if (remove) {
-            user.removeFavorite(offer);
+    public void addFavorite(Offer offer, User user) throws UserException {
+        if (!user.isFavoritePresent(offer) && !offer.getUser().equals(user.getUsername())) {
+            user.addFavorite(offer);
             userRepo.save(user);
-        } else {
-            if (!user.isFavoritePresent(offer) && !offer.getUser().equals(user.getUsername())) {
-                user.addFavorite(offer);
-                userRepo.save(user);
-                try {
-                    sendFavEmail(offer);
-                } catch (MessagingException | UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            } else throw new UserException("cant add offer to fav");
-        }
+        } else throw new UserException("cant add offer to fav");
+
+    }
+
+    public void removeFavorite(Offer offer) {
+        User user = userRepo.findByUsername(servletRequest.getRemoteUser());
+        user.removeFavorite(offer);
+        userRepo.save(user);
     }
 
     public List<Offer> getFavoriteOffers() {
@@ -108,7 +105,8 @@ public class OfferService {
         return user.getFavoritesList();
     }
 
-    private void sendFavEmail(Offer offer)
+    @Async
+    public void sendFavEmail(Offer offer)
             throws MessagingException, UnsupportedEncodingException {
         User user = userRepo.findByUsername(offer.getUser());
         String toAddress = user.getEmail();

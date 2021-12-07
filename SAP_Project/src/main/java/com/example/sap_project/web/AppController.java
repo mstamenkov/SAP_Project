@@ -85,18 +85,21 @@ public class AppController {
     @GetMapping("/favorite/{id}")
     public String addFavorite(@PathVariable("id") long id, RedirectAttributes redirAttrs) throws RecordNotFoundException {
         try {
-            offerService.addRemoveFavorite(offerService.getOfferById(id), false);
+            offerService.addFavorite(offerService.getOfferById(id), userRepo.findByUsername(servletRequest.getRemoteUser()));
+            offerService.sendFavEmail(offerService.getOfferById(id));
         } catch (UserException e) {
             redirAttrs.addFlashAttribute("error", e.getMessage());
             return "redirect:/home";
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
         redirAttrs.addFlashAttribute("success", "fav added");
         return "redirect:/home";
     }
 
     @GetMapping("/rfav/{id}")
-    public String removeFavorite(@PathVariable("id") long id, Model model, RedirectAttributes redirAttrs) throws RecordNotFoundException, UserException {
-        offerService.addRemoveFavorite(offerService.getOfferById(id), true);
+    public String removeFavorite(@PathVariable("id") long id, Model model, RedirectAttributes redirAttrs) throws RecordNotFoundException {
+        offerService.removeFavorite(offerService.getOfferById(id));
         redirAttrs.addFlashAttribute("error", "fav removed");
         return "redirect:/myfav";
     }
