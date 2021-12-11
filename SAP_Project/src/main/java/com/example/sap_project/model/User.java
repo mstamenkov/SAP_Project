@@ -32,10 +32,11 @@ public class User {
     private boolean isAdmin;
 
     @OneToMany
+    @JoinColumn(name = "user_id")
     @Cascade(org.hibernate.annotations.CascadeType.DELETE)
     private List<Offer> entityList;
 
-    @OneToMany
+    @ManyToMany
     @Cascade(org.hibernate.annotations.CascadeType.DELETE)
     private List<Offer> favoritesList;
 

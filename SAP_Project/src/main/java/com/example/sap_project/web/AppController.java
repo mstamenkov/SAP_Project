@@ -3,10 +3,13 @@ package com.example.sap_project.web;
 import com.example.sap_project.exception.RecordNotFoundException;
 import com.example.sap_project.exception.RegistrationException;
 import com.example.sap_project.exception.UserException;
+import com.example.sap_project.model.Category;
 import com.example.sap_project.model.Offer;
 import com.example.sap_project.model.User;
+import com.example.sap_project.repository.CategoryRepository;
 import com.example.sap_project.repository.OfferRepository;
 import com.example.sap_project.repository.UserRepository;
+import com.example.sap_project.service.CategoryService;
 import com.example.sap_project.service.OfferService;
 import com.example.sap_project.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +36,16 @@ public class AppController {
     private OfferRepository offerRepo;
 
     @Autowired
+    private CategoryRepository categoryRepo;
+
+    @Autowired
     private UserDetailsServiceImpl service;
 
     @Autowired
     private OfferService offerService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @Autowired
     HttpServletRequest servletRequest;
@@ -48,22 +57,25 @@ public class AppController {
 
 
     @PostMapping("/create")
-    public String createOffer(Offer offerEntity) {
+    public String createOffer(Offer offerEntity, Category category) {
         System.out.println(offerEntity.getPhone() + offerEntity.getDescription());
-        offerService.addUpdateOffer(offerEntity);
+        offerService.addUpdateOffer(offerEntity, category);
         return "redirect:/home";
     }
 
     @GetMapping(path = {"/create", "/create/{id}"})
     public String createOffer(Model model, @PathVariable("id") Optional<Long> id, RedirectAttributes redirAttrs) throws RecordNotFoundException {
+        model.addAttribute("categories", categoryRepo.findAll());
         if (id.isPresent()) {
             if (offerService.ownerCheck(id.get())) {
                 model.addAttribute("offer", offerService.getOfferById(id.get()));
+                model.addAttribute("category", categoryRepo.getById(categoryRepo.getCategoryIdByOfferId(offerService.getOfferById(id.get()).getId())));
             } else {
                 redirAttrs.addFlashAttribute("error", "Unknown offer id");
                 return "redirect:/home";
             }
         } else {
+            model.addAttribute("category", new Category());
             model.addAttribute("offer", new Offer());
         }
         return "add_offer";
@@ -73,6 +85,7 @@ public class AppController {
     public String listOffers(Model model) {
         User user = userRepo.findByUsername(servletRequest.getRemoteUser());
         model.addAttribute("offers", user.getEntityList());
+        model.addAttribute("categories", categoryRepo.findAll());
         return "list_offers";
     }
 
@@ -107,9 +120,36 @@ public class AppController {
     @GetMapping("/myfav")
     public String listFavorite(Model model) {
         model.addAttribute("offers", offerService.getFavoriteOffers());
+        model.addAttribute("categories", categoryRepo.findAll());
         return "favorites";
     }
 
+    @GetMapping(path = {"/addcategory", "/addcategory/{id}"})
+    public String addEditCategory(@PathVariable("id") Optional<Long> id, Model model, RedirectAttributes redirAttrs) throws RecordNotFoundException {
+        if (userRepo.findByUsername(servletRequest.getRemoteUser()).isAdmin()) {
+            if (id.isPresent()) {
+                model.addAttribute("category", categoryService.getCategoryById(id.get()));
+            } else {
+                model.addAttribute("category", new Category());
+            }
+            return "add_category";
+        } else {
+            redirAttrs.addFlashAttribute("error", "dont have access");
+            return "redirect:/home";
+        }
+    }
+
+    @PostMapping("/addcategory")
+    public String postCategory(Category category, RedirectAttributes redirAttrs) {
+        try {
+            categoryService.addEditCategory(category);
+            redirAttrs.addFlashAttribute("success", "ADMIN MESSAGE: Category successfully added");
+        } catch (UserException e) {
+            redirAttrs.addFlashAttribute("error", "ADMIN MESSAGE: " + e.getMessage());
+            return "redirect:/home";
+        }
+        return "redirect:/home";
+    }
     /////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -144,6 +184,7 @@ public class AppController {
     @GetMapping("/home")
     public String homePage(Model model) {
         model.addAttribute("offers", offerService.getOffersByStatus(true));
+        model.addAttribute("categories", categoryRepo.findAll());
         return "home";
     }
 

@@ -33,6 +33,7 @@
                             <tr>
                                 <th>Title</th>
                                 <th>Description</th>
+                                <th>Category</th>
                                 <th>User</th>
                                 <th>Phone</th>
                                 <th>Price</th>
@@ -50,6 +51,8 @@
                                     </a>
                                 </td>
                                 <td th:text="${offer.description}"></td>
+                                <td th:each="category : ${categories}" th:if="*{category.offers.contains(offer)}"
+                                    th:text="*{category.categoryName}"></td>
                                 <td th:text="${offer.user}"></td>
                                 <td th:text="${offer.phone}"></td>
                                 <td th:text="${offer.price}"></td>

@@ -2,8 +2,10 @@ package com.example.sap_project.service;
 
 import com.example.sap_project.exception.RecordNotFoundException;
 import com.example.sap_project.exception.UserException;
+import com.example.sap_project.model.Category;
 import com.example.sap_project.model.Offer;
 import com.example.sap_project.model.User;
+import com.example.sap_project.repository.CategoryRepository;
 import com.example.sap_project.repository.OfferRepository;
 import com.example.sap_project.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ public class OfferService {
     private UserRepository userRepo;
 
     @Autowired
+    private CategoryRepository categoryRepo;
+
+    @Autowired
     private OfferRepository offerRepo;
 
     @Autowired
@@ -36,17 +41,20 @@ public class OfferService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void addUpdateOffer(Offer offer) {
+    public void addUpdateOffer(Offer offer, Category categoryName) {
         if (offer.getUser().isEmpty()) {
+            Category category = categoryRepo.getCategoryByName(categoryName.getCategoryName());
             User user = userRepo.findByUsername(servletRequest.getRemoteUser());
             offer.setUser(servletRequest.getRemoteUser());
             offer.setDateOfCreation(new Date(System.currentTimeMillis()));
             offer.setDateOfExpiry(null);
             offer.setActive(true);
+            category.addOffer(offer);
             user.addOffer(offer);
 
             offerRepo.save(offer);
             userRepo.save(user);
+            categoryRepo.save(category);
         } else {
             if (offer.isActive()) {
                 offer.setDateOfExpiry(null);

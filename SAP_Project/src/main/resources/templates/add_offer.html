@@ -16,36 +16,51 @@
     <div class="card">
         <div class="card-body">
             <div class="col-md-10">
-                <form action="#" th:action="@{/create}" th:object="${offer}" method="post">
+                <form action="#" th:action="@{/create}" method="post">
                     <div class="row">
+                        <div class="form-group col-md-8" th:if="*{offer.dateOfCreation == null}">
+                            <label for="category" class="col-form-label">Category</label>
+                            <select name="Category" id="category" th:field="*{category.categoryName}">
+                                <option th:each="categoryList : ${categories}" th:text="*{categoryList.categoryName}"
+                                        th:value="*{categoryList.categoryName}"></option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-8" th:unless="*{offer.dateOfCreation == null}">
+                            <label for="category" class="col-form-label">Category</label>
+                            <input th:value="*{category.categoryName}" type="text" class="form-control"
+                                   disabled="disabled"
+                                   id="category" name="Category"/>
+                        </div>
+
                         <div class="form-group col-md-8">
                             <label for="title" class="col-form-label">Title</label>
-                            <input th:field="*{title}" type="text" class="form-control"
+                            <input th:field="*{offer.title}" type="text" class="form-control"
                                    id="title" placeholder="Title" name="Title"/>
                         </div>
 
                         <div class="form-group col-md-8">
                             <label for="description" class="col-form-label">Description</label>
-                            <input type="text" th:field="*{description}" class="form-control"
+                            <input type="text" th:field="*{offer.description}" class="form-control"
                                    id="description" placeholder="Description"/>
                         </div>
 
                         <div class="form-group col-md-8">
                             <label for="price" class="col-form-label">Price</label>
-                            <input type="number" step="0.01" min="0" th:field="*{price}" class="form-control"
+                            <input type="number" step="0.01" min="0" th:field="*{offer.price}" class="form-control"
                                    id="price" placeholder="Name"/>
                         </div>
 
                         <div class="form-group col-md-8">
                             <label for="phone" class="col-form-label">phone</label>
-                            <input type="text" pattern="[0]{1}[8-9]{1}[7-9]{2}[0-9]{6}" th:field="*{phone}"
+                            <input type="text" pattern="[0]{1}[8-9]{1}[7-9]{2}[0-9]{6}" th:field="*{offer.phone}"
                                    class="form-control"
                                    id="phone" placeholder="Phone"/>
                         </div>
 
                         <div class="form-group col-md-8" th:if="${offer.user != null}">
                             <label for="isActive" class="col-form-label">isActive</label>
-                            <select name="isActive" id="isActive" th:field="*{active}">
+                            <select name="isActive" id="isActive" th:field="*{offer.active}">
                                 <option value="true">Active</option>
                                 <option value="false">Inactive</option>
                             </select>
@@ -55,11 +70,12 @@
                             <input type="submit" class="btn btn-primary" value=" Submit ">
                         </div>
 
-                        <input type="hidden" id="user" th:field="*{user}">
-                        <input type="hidden" id="id4" th:field="*{id}">
+                        <input type="hidden" id="user" th:field="*{offer.user}">
+                        <input type="hidden" id="id4" th:field="*{offer.id}">
                         <input type="hidden" id="doc" th:if="${offer.dateOfCreation != null}"
-                               th:field="*{dateOfCreation}">
-                        <input type="hidden" id="dox" th:if="${offer.dateOfExpiry != null}" th:field="*{dateOfExpiry}">
+                               th:field="*{offer.dateOfCreation}">
+                        <input type="hidden" id="dox" th:if="${offer.dateOfExpiry != null}"
+                               th:field="*{offer.dateOfExpiry}">
 
                     </div>
                 </form>
