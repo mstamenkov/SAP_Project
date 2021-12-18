@@ -18,6 +18,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     public Long getCategoryIdByOfferId(long offerId);
 
     @Modifying
-    @Query("update Category c set c.categoryName = ?1")
-    public void changeCategoryName(String categoryName);
+    @Query("update Category c set c.categoryName = ?1 where c.id = ?2")
+    public void changeCategoryName(String categoryName, long id);
 }

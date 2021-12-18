@@ -8,7 +8,7 @@ import java.sql.Date;
 public class Offer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; //make final all
 
     @Column(nullable = false)
     private String title;

@@ -13,6 +13,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -41,28 +42,29 @@ public class OfferService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void addUpdateOffer(Offer offer, Category categoryName) {
-        if (offer.getUser().isEmpty()) {
-            Category category = categoryRepo.getCategoryByName(categoryName.getCategoryName());
-            User user = userRepo.findByUsername(servletRequest.getRemoteUser());
-            offer.setUser(servletRequest.getRemoteUser());
-            offer.setDateOfCreation(new Date(System.currentTimeMillis()));
-            offer.setDateOfExpiry(null);
-            offer.setActive(true);
-            category.addOffer(offer);
-            user.addOffer(offer);
+    public void addOffer(Offer offer, Category categoryName) {
+        Category category = categoryRepo.getCategoryByName(categoryName.getCategoryName());
+        User user = userRepo.findByUsername(servletRequest.getRemoteUser());
+        offer.setUser(servletRequest.getRemoteUser());
+        offer.setDateOfCreation(new Date(System.currentTimeMillis()));
+        offer.setDateOfExpiry(null);
+        offer.setActive(true);
+        category.addOffer(offer);
+        user.addOffer(offer);
 
-            offerRepo.save(offer);
-            userRepo.save(user);
-            categoryRepo.save(category);
+        offerRepo.save(offer);
+        userRepo.save(user);
+        categoryRepo.save(category);
+
+    }
+
+    public void updateOffer(Offer offer) {
+        if (offer.isActive()) {
+            offer.setDateOfExpiry(null);
         } else {
-            if (offer.isActive()) {
-                offer.setDateOfExpiry(null);
-            } else {
-                offer.setDateOfExpiry(new Date(System.currentTimeMillis()));
-            }
-            offerRepo.save(offer);
+            offer.setDateOfExpiry(new Date(System.currentTimeMillis()));
         }
+        offerRepo.save(offer);
     }
 
     public Offer getOfferById(Long id) throws RecordNotFoundException {
@@ -86,6 +88,7 @@ public class OfferService {
         return (offer.getUser().equals(servletRequest.getRemoteUser()));
     }
 
+    @Transactional
     public void deleteOffer(long id) {
         Offer offer = offerRepo.getById(id);
         User user = userRepo.findByUsername(offer.getUser());
@@ -119,8 +122,8 @@ public class OfferService {
         User user = userRepo.findByUsername(offer.getUser());
         String toAddress = user.getEmail();
         String subject = "Added offer to Favorite";
-        String content = "Dear [[name]],<br>"
-                + "Your offer for [[offerTitle]] was added to Favorite<br>"
+        String content = "Dear %s,<br>"
+                + "Your offer for %s was added to Favorite<br>"
                 + "Lorem Ipsum";
 
         MimeMessage message = mailSender.createMimeMessage();
@@ -130,8 +133,7 @@ public class OfferService {
         helper.setTo(toAddress);
         helper.setSubject(subject);
 
-        content = content.replace("[[name]]", user.getUsername());
-        content = content.replace("[[offerTitle]]", offer.getTitle());
+        content = String.format(content, user.getUsername(), offer.getTitle());
 
         helper.setText(content, true);
 

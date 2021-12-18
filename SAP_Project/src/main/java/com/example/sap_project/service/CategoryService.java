@@ -32,7 +32,7 @@ public class CategoryService {
         if (user.isAdmin()) {
             if (!categoryRepo.findCategoriesByName(category.getCategoryName())) {
                 if (category.getId() == null) categoryRepo.save(category);
-                else categoryRepo.changeCategoryName(category.getCategoryName());
+                else categoryRepo.changeCategoryName(category.getCategoryName(), category.getId());
             } else throw new UserException("category already added");
         } else throw new UserException("don't have access");
     }

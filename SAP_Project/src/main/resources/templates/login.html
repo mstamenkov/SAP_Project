@@ -1,21 +1,31 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
->
+<html lang="en">
 <head>
-    <title>login</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Please sign in</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet" crossorigin="anonymous"/>
 </head>
 <body>
-<div th:if="${param.error}">
-    Invalid username and password.
+<div class="container">
+    <form class="form-signin" method="post" th:action="@{/login}">
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <div th:if="${param.error}" class="alert alert-danger" role="alert">Bad credentials or disabled user</div>
+        <div th:if="${param.logout}" class="alert alert-success" role="alert">Logout success</div>
+        <p>
+            <label for="username" class="sr-only">Username</label>
+            <input type="text" id="username" name="email" class="form-control" placeholder="Username" required
+                   autofocus>
+        </p>
+        <p>
+            <label for="password" class="sr-only">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+        </p>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <p>Don't have registration ? <a href="/register">click here</a></p>
+    </form>
+
 </div>
-<div th:if="${param.logout}">
-    You have been logged out.
-</div>
-<form th:action="@{/login}" method="post">
-    <div><label> Email : <input type="text" name="email"/> </label></div>
-    <div><label> Password: <input type="password" name="password"/> </label></div>
-    <div><a href="/registration">Sign up</a></div>
-    <div><input type="submit" value="Sign In"/></div>
-</form>
 </body>
 </html>

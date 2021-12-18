@@ -14,6 +14,8 @@ import com.example.sap_project.service.OfferService;
 import com.example.sap_project.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 @Controller
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AppController {
 
     @Autowired
@@ -52,14 +55,16 @@ public class AppController {
 
     @GetMapping("")
     public String viewHomePage() {
-        return "index";
+        return "redirect:/home";
     }
-
 
     @PostMapping("/create")
     public String createOffer(Offer offerEntity, Category category) {
-        System.out.println(offerEntity.getPhone() + offerEntity.getDescription());
-        offerService.addUpdateOffer(offerEntity, category);
+        if (offerEntity.getUser().isEmpty()) {
+            offerService.addOffer(offerEntity, category);
+        } else {
+            offerService.updateOffer(offerEntity);
+        }
         return "redirect:/home";
     }
 
@@ -143,12 +148,38 @@ public class AppController {
     public String postCategory(Category category, RedirectAttributes redirAttrs) {
         try {
             categoryService.addEditCategory(category);
-            redirAttrs.addFlashAttribute("success", "ADMIN MESSAGE: Category successfully added");
+            redirAttrs.addFlashAttribute("successCategory", "ADMIN MESSAGE: Category successfully added/edited");
         } catch (UserException e) {
-            redirAttrs.addFlashAttribute("error", "ADMIN MESSAGE: " + e.getMessage());
-            return "redirect:/home";
+            redirAttrs.addFlashAttribute("errorCategory", "ADMIN MESSAGE: " + e.getMessage());
+            return "redirect:/adminpage";
         }
-        return "redirect:/home";
+        return "redirect:/adminpage";
+    }
+
+    @PreAuthorize("@userDetailsServiceImpl.admin")
+    @GetMapping("/adminpage")
+    public String listUsers(Model model) {
+        model.addAttribute("users", userRepo.findAll());
+        model.addAttribute("categories", categoryRepo.findAll());
+        return "admin_page";
+    }
+
+    @PreAuthorize("@userDetailsServiceImpl.admin")
+    @GetMapping("/addadmin/{id}")
+    public String addAdmin(@PathVariable("id") long id) {
+        service.setAdmin(id, true);
+        return "redirect:/adminpage";
+    }
+
+    @PreAuthorize("@userDetailsServiceImpl.admin")
+    @GetMapping("/removeadmin/{id}")
+    public String removeAdmin(@PathVariable("id") long id, RedirectAttributes redirAttrs) {
+        try {
+            service.setAdmin(id, false);
+        } catch (UserException e) {
+            redirAttrs.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/adminpage";
     }
     /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -164,7 +195,8 @@ public class AppController {
     public String processRegister(User user, HttpServletRequest request, RedirectAttributes redirAttrs) throws UnsupportedEncodingException, MessagingException {
         try {
             if (service.verifyEmail(user)) {
-                service.register(user, getSiteURL(request));
+                service.register(user);
+                service.sendVerificationEmail(user, getSiteURL(request));
                 return "register_success";
             } else {
                 redirAttrs.addFlashAttribute("error", "Invalid email. Please check you email and try again.");
@@ -185,6 +217,7 @@ public class AppController {
     public String homePage(Model model) {
         model.addAttribute("offers", offerService.getOffersByStatus(true));
         model.addAttribute("categories", categoryRepo.findAll());
+        model.addAttribute("user", userRepo.findByUsername(servletRequest.getRemoteUser()));
         return "home";
     }
 
@@ -196,5 +229,10 @@ public class AppController {
             model.addAttribute("verify", "not activated :(");
         }
         return "emailVerify";
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
     }
 }
