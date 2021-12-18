@@ -4,34 +4,42 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Home</title>
+    <title>Add Offer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
 </head>
 
 <body>
-<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
-<form th:action="@{/logout}" method="post">
-    <input type="submit" value="Sign Out"/>
-</form>
-<div class="container my-2">
+<div class="container my-5">
+    <h3> Offers by period of expiration</h3>
     <div class="card">
         <div class="card-body">
-            <div th:switch="${offers}" class="container my-5">
-                <h2>Home</h2>
+            <div class="col-md-10">
                 <p class="my-5">
-                    <a href="/create" class="btn btn-primary">
-                        <i class="fas fa-cart-plus ml-2"> Add Offer </i></a>
-                    <a href="/myoffers" class="btn btn-primary">
-                        <i class="fas fa-address-book ml-2"> My Offers </i></a>
-                    <a href="/myfav" class="btn btn-primary">
-                        <i class="fas fa-heart ml-2"> Favorites </i></a>
-                    <a href="/newoffers" class="btn btn-primary">
-                        <i class="fas fa-heart ml-2"> New offers by period </i></a>
-                    <a th:if="${user.isAdmin()}" href="/adminpage" class="btn btn-danger">
-                        <i class="fas fa-user ml-2"> Admin panel </i></a>
+                    <a href="/adminpage" class="btn btn-primary">
+                        <i class="fas fa-home ml-2"> Admin page </i></a>
                 </p>
+                <form action="#" th:action="@{/expoffers}" method="post">
+                    <div class="row">
+                        <div class="form-group col-md-5">
+                            <label for="startDate" class="col-form-label">Start</label>
+                            <input type="date" th:name="startDate" class="form-control" id="startDate"/>
+                        </div>
+
+                        <div class="form-group col-md-5">
+                            <label for="endDate" class="col-form-label">End</label>
+                            <input type="date" th:name="endDate" class="form-control" id="endDate"/>
+                        </div>
+
+                        <div class="col-md-6">
+                            <input type="submit" class="btn btn-primary" value=" Submit ">
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div th:switch="${offers}" class="container my-5">
                 <div class="col-md-12">
                     <h2 th:case="null">No record found !!</h2>
                     <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
@@ -61,22 +69,11 @@
                                 <td th:text="${offer.user}"></td>
                                 <td th:text="${offer.phone}"></td>
                                 <td th:text="${offer.price}"></td>
-                                <td>
-                                    <a th:if="${offer.user != #httpServletRequest.remoteUser}"
-                                       th:href="@{/favorite/{id}(id=${offer.id})}" class="btn btn-primary">
-                                        <i class="fas fa-heart ml-2"></i>
-                                    </a>
-                                </td>
                             </tr>
                             </tbody>
                         </table>
-
-
                     </div>
-
                 </div>
-
-
             </div>
         </div>
     </div>

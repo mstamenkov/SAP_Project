@@ -21,11 +21,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.util.Optional;
 
 @Controller
@@ -129,21 +131,18 @@ public class AppController {
         return "favorites";
     }
 
+    @PreAuthorize("@userDetailsServiceImpl.admin")
     @GetMapping(path = {"/addcategory", "/addcategory/{id}"})
     public String addEditCategory(@PathVariable("id") Optional<Long> id, Model model, RedirectAttributes redirAttrs) throws RecordNotFoundException {
-        if (userRepo.findByUsername(servletRequest.getRemoteUser()).isAdmin()) {
-            if (id.isPresent()) {
-                model.addAttribute("category", categoryService.getCategoryById(id.get()));
-            } else {
-                model.addAttribute("category", new Category());
-            }
-            return "add_category";
+        if (id.isPresent()) {
+            model.addAttribute("category", categoryService.getCategoryById(id.get()));
         } else {
-            redirAttrs.addFlashAttribute("error", "dont have access");
-            return "redirect:/home";
+            model.addAttribute("category", new Category());
         }
+        return "add_category";
     }
 
+    @PreAuthorize("@userDetailsServiceImpl.admin")
     @PostMapping("/addcategory")
     public String postCategory(Category category, RedirectAttributes redirAttrs) {
         try {
@@ -180,6 +179,32 @@ public class AppController {
             redirAttrs.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/adminpage";
+    }
+
+    @GetMapping("/newoffers")
+    public String date() {
+        return "new_offers_list";
+    }
+
+    @PostMapping("/newoffers")
+    public String date(@RequestParam(value = "endDate") String endDate, @RequestParam(value = "startDate") String startDate, Model model) throws ParseException {
+        model.addAttribute("offers", offerService.findByDate(startDate, endDate, true));
+        model.addAttribute("categories", categoryRepo.findAll());
+        return "new_offers_list";
+    }
+
+    @PreAuthorize("@userDetailsServiceImpl.admin")
+    @GetMapping("/expoffers")
+    public String expiredOffers() {
+        return "exp_offers_list";
+    }
+
+    @PreAuthorize("@userDetailsServiceImpl.admin")
+    @PostMapping("/expoffers")
+    public String expiredOffers(@RequestParam(value = "endDate") String endDate, @RequestParam(value = "startDate") String startDate, Model model) throws ParseException {
+        model.addAttribute("offers", offerService.findByDate(startDate, endDate, false));
+        model.addAttribute("categories", categoryRepo.findAll());
+        return "exp_offers_list";
     }
     /////////////////////////////////////////////////////////////////////////////////////////
 

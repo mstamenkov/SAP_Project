@@ -21,6 +21,8 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -139,5 +141,19 @@ public class OfferService {
 
         mailSender.send(message);
 
+    }
+
+    public List<Offer> findByDate(String startDate, String endDate, boolean isActive) throws ParseException {
+        List<Offer> offers;
+        java.util.Date startDateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
+        java.util.Date endDateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);
+        if (isActive) {
+            offers = offerRepo.findAll();
+            offers.removeIf(offer -> !(startDateFormat.before(offer.getDateOfCreation()) && endDateFormat.after(offer.getDateOfCreation())));
+        } else {
+            offers = offerRepo.getInactiveOffers();
+            offers.removeIf(offer -> !(startDateFormat.before(offer.getDateOfExpiry()) && endDateFormat.after(offer.getDateOfExpiry())));
+        }
+        return offers;
     }
 }
