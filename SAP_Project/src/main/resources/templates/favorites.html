@@ -54,7 +54,8 @@
                                 <td th:text="${offer.user}"></td>
                                 <td th:text="${offer.phone}"></td>
                                 <td th:text="${offer.price}"></td>
-                                <td th:text="${offer.active}"></td>
+                                <td th:if="${offer.active}" th:text="Active"></td>
+                                <td th:unless="${offer.active}" th:text="Inactive"></td>
                                 <td>
                                     <a th:href="@{/rfav/{id}(id=${offer.id})}" class="btn btn-primary">
                                         <i class="fas fa-heart-broken ml-2"></i>

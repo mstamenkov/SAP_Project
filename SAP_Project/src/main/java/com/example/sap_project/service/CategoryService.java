@@ -3,7 +3,6 @@ package com.example.sap_project.service;
 import com.example.sap_project.exception.RecordNotFoundException;
 import com.example.sap_project.exception.UserException;
 import com.example.sap_project.model.Category;
-import com.example.sap_project.model.User;
 import com.example.sap_project.repository.CategoryRepository;
 import com.example.sap_project.repository.OfferRepository;
 import com.example.sap_project.repository.UserRepository;
@@ -28,13 +27,10 @@ public class CategoryService {
     private CategoryRepository categoryRepo;
 
     public void addEditCategory(Category category) throws UserException {
-        User user = userRepo.findByUsername(servletRequest.getRemoteUser());
-        if (user.isAdmin()) {
             if (!categoryRepo.findCategoriesByName(category.getCategoryName())) {
                 if (category.getId() == null) categoryRepo.save(category);
                 else categoryRepo.changeCategoryName(category.getCategoryName(), category.getId());
             } else throw new UserException("category already added");
-        } else throw new UserException("don't have access");
     }
 
     public Category getCategoryById(Long id) throws RecordNotFoundException {

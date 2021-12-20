@@ -182,13 +182,18 @@ public class AppController {
     }
 
     @GetMapping("/newoffers")
-    public String date() {
+    public String newOffers() {
         return "new_offers_list";
     }
 
     @PostMapping("/newoffers")
-    public String date(@RequestParam(value = "endDate") String endDate, @RequestParam(value = "startDate") String startDate, Model model) throws ParseException {
-        model.addAttribute("offers", offerService.findByDate(startDate, endDate, true));
+    public String postNewOffers(@RequestParam(value = "endDate") String endDate, @RequestParam(value = "startDate") String startDate, Model model, RedirectAttributes redirAttrs) throws ParseException {
+        try {
+            model.addAttribute("offers", offerService.findByDate(startDate, endDate, true));
+        } catch (UserException e) {
+            redirAttrs.addFlashAttribute("error", e.getMessage());
+            return "redirect:/newoffers";
+        }
         model.addAttribute("categories", categoryRepo.findAll());
         return "new_offers_list";
     }
@@ -201,8 +206,13 @@ public class AppController {
 
     @PreAuthorize("@userDetailsServiceImpl.admin")
     @PostMapping("/expoffers")
-    public String expiredOffers(@RequestParam(value = "endDate") String endDate, @RequestParam(value = "startDate") String startDate, Model model) throws ParseException {
-        model.addAttribute("offers", offerService.findByDate(startDate, endDate, false));
+    public String postExpiredOffers(@RequestParam(value = "endDate") String endDate, @RequestParam(value = "startDate") String startDate, Model model, RedirectAttributes redirAttrs) throws ParseException {
+        try {
+            model.addAttribute("offers", offerService.findByDate(startDate, endDate, false));
+        } catch (UserException e) {
+            redirAttrs.addFlashAttribute("error", e.getMessage());
+            return "redirect:/expoffers";
+        }
         model.addAttribute("categories", categoryRepo.findAll());
         return "exp_offers_list";
     }

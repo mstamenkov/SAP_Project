@@ -143,7 +143,8 @@ public class OfferService {
 
     }
 
-    public List<Offer> findByDate(String startDate, String endDate, boolean isActive) throws ParseException {
+    public List<Offer> findByDate(String startDate, String endDate, boolean isActive) throws ParseException, UserException {
+        if (startDate.isEmpty() || endDate.isEmpty()) throw new UserException("Both fields must to be filled");
         List<Offer> offers;
         java.util.Date startDateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
         java.util.Date endDateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);

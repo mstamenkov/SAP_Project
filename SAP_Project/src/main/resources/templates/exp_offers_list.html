@@ -20,6 +20,7 @@
                     <a href="/adminpage" class="btn btn-primary">
                         <i class="fas fa-home ml-2"> Admin page </i></a>
                 </p>
+                <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
                 <form action="#" th:action="@{/expoffers}" method="post">
                     <div class="row">
                         <div class="form-group col-md-5">
@@ -42,8 +43,6 @@
             <div th:switch="${offers}" class="container my-5">
                 <div class="col-md-12">
                     <h2 th:case="null">No record found !!</h2>
-                    <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
-                    <div class="alert alert-success" role="alert" th:text="${success}" th:if="${success}"></div>
                     <div th:case="*">
                         <table class="table table-striped table-responsive-md">
                             <thead>
@@ -54,6 +53,7 @@
                                 <th>User</th>
                                 <th>Phone</th>
                                 <th>Price</th>
+                                <th>Date of expiry</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -69,6 +69,7 @@
                                 <td th:text="${offer.user}"></td>
                                 <td th:text="${offer.phone}"></td>
                                 <td th:text="${offer.price}"></td>
+                                <td th:text="${offer.dateOfExpiry}"></td>
                             </tr>
                             </tbody>
                         </table>
