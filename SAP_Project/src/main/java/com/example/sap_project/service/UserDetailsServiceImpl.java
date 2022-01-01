@@ -43,7 +43,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public void sendVerificationEmail(User user, String siteURL)
             throws MessagingException, UnsupportedEncodingException {
         String toAddress = user.getEmail();
-        String subject = "Please verify your registration";
+        final String subject = "Please verify your registration";
         String content = "Dear %s,<br>"
                 + "Please click the link below to verify your registration:<br>"
                 + "<h3><a href=\"%s\" target=\"_self\">VERIFY</a></h3>"
@@ -69,7 +69,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepo.findByEmail(username);
-        if (user == null) { //to do read for optional
+        if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
         return new UserDetailsImpl(user);
@@ -120,7 +120,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Optional<User> user = userRepo.findById(id);
         if (user.isPresent()) {
             if (user.get().getUsername().equals("admin")) {
-                throw new UserException("can't change admin status of user 'admin'");
+                throw new UserException("can't change admin status for user 'admin'");
             }
             user.ifPresent(value -> value.setAdmin(status));
             userRepo.save(user.get());

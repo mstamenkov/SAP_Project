@@ -70,14 +70,9 @@ public class OfferService {
         offerRepo.save(offer);
     }
 
-    public Offer getOfferById(Long id) throws RecordNotFoundException {//fix optional
+    public Offer getOfferById(Long id) throws RecordNotFoundException {
         Optional<Offer> offer = offerRepo.findById(id);
-
-        if (offer.isPresent()) {
-            return offer.get();
-        } else {
-            throw new RecordNotFoundException("No file record exist for given id");
-        }
+        return offer.orElseThrow(RecordNotFoundException::new);
     }
 
     public ArrayList<Offer> getOffersByStatus(boolean isActive) {
@@ -105,7 +100,11 @@ public class OfferService {
         if (!user.isFavoritePresent(offer) && !offer.getUser().equals(user.getUsername())) {
             user.addFavorite(offer);
             userRepo.save(user);
-        } else throw new UserException("cant add offer to fav");
+        } else {
+            String errorMessage = "cant add offer for %s to fav";
+            errorMessage = String.format(errorMessage, offer.getTitle());
+            throw new UserException(errorMessage);
+        }
 
     }
 
@@ -122,10 +121,10 @@ public class OfferService {
 
     @Async
     public void sendFavEmail(Offer offer)
-            throws MessagingException, UnsupportedEncodingException { //const strings
+            throws MessagingException, UnsupportedEncodingException {
         User user = userRepo.findByUsername(offer.getUser());
         String toAddress = user.getEmail();
-        String subject = "Added offer to Favorite";
+        final String subject = "Added offer to Favorite";
         String content = "Dear %s,<br>"
                 + "Your offer for %s was added to Favorite<br>"
                 + "Lorem Ipsum";

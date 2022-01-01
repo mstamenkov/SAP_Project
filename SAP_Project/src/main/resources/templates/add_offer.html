@@ -59,7 +59,7 @@
                         </div>
 
                         <div class="form-group col-md-8" th:if="${offer.user != null}">
-                            <label for="isActive" class="col-form-label">isActive</label>
+                            <label for="isActive" class="col-form-label">Status</label>
                             <select name="isActive" id="isActive" th:field="*{offer.active}">
                                 <option value="true">Active</option>
                                 <option value="false">Inactive</option>

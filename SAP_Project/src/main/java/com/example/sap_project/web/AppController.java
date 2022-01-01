@@ -7,7 +7,6 @@ import com.example.sap_project.model.Category;
 import com.example.sap_project.model.Offer;
 import com.example.sap_project.model.User;
 import com.example.sap_project.repository.CategoryRepository;
-import com.example.sap_project.repository.OfferRepository;
 import com.example.sap_project.repository.UserRepository;
 import com.example.sap_project.service.CategoryService;
 import com.example.sap_project.service.OfferService;
@@ -36,9 +35,6 @@ public class AppController {
 
     @Autowired
     private UserRepository userRepo;
-
-    @Autowired
-    private OfferRepository offerRepo;
 
     @Autowired
     private CategoryRepository categoryRepo;

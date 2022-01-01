@@ -15,4 +15,8 @@ public class RecordNotFoundException extends RuntimeException {
 	public RecordNotFoundException(String message, Throwable t) {
 		super(message, t);
 	}
+
+	public RecordNotFoundException() {
+		super("No file record exist for given id");
+	}
 }
