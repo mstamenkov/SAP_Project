@@ -133,7 +133,7 @@ public class AppController {
 
     @PreAuthorize("@userDetailsServiceImpl.admin")
     @GetMapping(path = {"/addcategory", "/addcategory/{id}"})
-    public String addEditCategory(@PathVariable("id") Optional<Long> id, Model model, RedirectAttributes redirAttrs) throws RecordNotFoundException {
+    public String addEditCategory(@PathVariable("id") Optional<Long> id, Model model) throws RecordNotFoundException {
         if (id.isPresent()) {
             model.addAttribute("category", categoryService.getCategoryById(id.get()));
         } else {

@@ -14,14 +14,6 @@ import java.util.Optional;
 
 @Service
 public class CategoryService {
-    @Autowired
-    private UserRepository userRepo;
-
-    @Autowired
-    private OfferRepository offerRepo;
-
-    @Autowired
-    HttpServletRequest servletRequest;
 
     @Autowired
     private CategoryRepository categoryRepo;
@@ -33,7 +25,7 @@ public class CategoryService {
             } else throw new UserException("category already added");
     }
 
-    public Category getCategoryById(Long id) throws RecordNotFoundException {
+    public Category getCategoryById(Long id) throws RecordNotFoundException {//orelse present optional
         Optional<Category> category = categoryRepo.findById(id);
 
         if (category.isPresent()) {

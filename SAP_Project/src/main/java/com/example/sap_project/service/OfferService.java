@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OfferService {
@@ -69,7 +70,7 @@ public class OfferService {
         offerRepo.save(offer);
     }
 
-    public Offer getOfferById(Long id) throws RecordNotFoundException {
+    public Offer getOfferById(Long id) throws RecordNotFoundException {//fix optional
         Optional<Offer> offer = offerRepo.findById(id);
 
         if (offer.isPresent()) {
@@ -96,6 +97,7 @@ public class OfferService {
         User user = userRepo.findByUsername(offer.getUser());
         user.removeOffer(offer);
         userRepo.save(user);
+        offerRepo.deleteFavoritesById(offer.getId());
         offerRepo.deleteOfferById(offer.getId());
     }
 
@@ -120,7 +122,7 @@ public class OfferService {
 
     @Async
     public void sendFavEmail(Offer offer)
-            throws MessagingException, UnsupportedEncodingException {
+            throws MessagingException, UnsupportedEncodingException { //const strings
         User user = userRepo.findByUsername(offer.getUser());
         String toAddress = user.getEmail();
         String subject = "Added offer to Favorite";
@@ -144,16 +146,17 @@ public class OfferService {
     }
 
     public List<Offer> findByDate(String startDate, String endDate, boolean isActive) throws ParseException, UserException {
-        if (startDate.isEmpty() || endDate.isEmpty()) throw new UserException("Both fields must to be filled");
         List<Offer> offers;
+        if (startDate.isEmpty() || endDate.isEmpty()){
+            throw new UserException("Both fields must to be filled");
+        }
+
         java.util.Date startDateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
         java.util.Date endDateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);
         if (isActive) {
-            offers = offerRepo.findAll();
-            offers.removeIf(offer -> !(startDateFormat.before(offer.getDateOfCreation()) && endDateFormat.after(offer.getDateOfCreation())));
+            offers = offerRepo.findAll().stream().filter(o -> o.isActive() && (startDateFormat.before(o.getDateOfCreation()) && endDateFormat.after(o.getDateOfCreation()))).collect(Collectors.toList());
         } else {
-            offers = offerRepo.getInactiveOffers();
-            offers.removeIf(offer -> !(startDateFormat.before(offer.getDateOfExpiry()) && endDateFormat.after(offer.getDateOfExpiry())));
+            offers = offerRepo.getInactiveOffers().stream().filter(o -> (startDateFormat.before(o.getDateOfExpiry()) && endDateFormat.after(o.getDateOfExpiry()))).collect(Collectors.toList());
         }
         return offers;
     }

@@ -14,6 +14,10 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
     @Query("delete from Offer o where o.id = ?1")
     public void deleteOfferById(long id);
 
+    @Modifying
+    @Query(nativeQuery = true, value = "delete from users_favorites_list where favorites_list_id = ?1")
+    public void deleteFavoritesById(long id);
+
     @Query("select o from Offer o where o.dateOfExpiry is not null")
     public List<Offer> getInactiveOffers();
 }
