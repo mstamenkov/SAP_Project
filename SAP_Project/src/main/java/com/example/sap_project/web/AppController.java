@@ -100,23 +100,25 @@ public class AppController {
 
     @GetMapping("/favorite/{id}")
     public String addFavorite(@PathVariable("id") long id, RedirectAttributes redirAttrs) throws RecordNotFoundException {
+        Offer offer = offerService.getOfferById(id);
         try {
-            offerService.addFavorite(offerService.getOfferById(id), userRepo.findByUsername(servletRequest.getRemoteUser()));
-            offerService.sendFavEmail(offerService.getOfferById(id));
+            offerService.addFavorite(offer, userRepo.findByUsername(servletRequest.getRemoteUser()));
+            offerService.sendFavEmail(offer);
         } catch (UserException e) {
             redirAttrs.addFlashAttribute("error", e.getMessage());
             return "redirect:/home";
         } catch (MessagingException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        redirAttrs.addFlashAttribute("success", "fav added");
+        redirAttrs.addFlashAttribute("success", "Offer for " + offer.getTitle() + " is added to favorite");
         return "redirect:/home";
     }
 
     @GetMapping("/rfav/{id}")
     public String removeFavorite(@PathVariable("id") long id, Model model, RedirectAttributes redirAttrs) throws RecordNotFoundException {
-        offerService.removeFavorite(offerService.getOfferById(id));
-        redirAttrs.addFlashAttribute("error", "fav removed");
+        Offer offer = offerService.getOfferById(id);
+        offerService.removeFavorite(offer);
+        redirAttrs.addFlashAttribute("error", "Offer for " + offer.getTitle() + " is removed from favorite");
         return "redirect:/myfav";
     }
 
@@ -218,8 +220,8 @@ public class AppController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());
-
         return "signup_form";
+
     }
 
     @PostMapping("/process_register")

@@ -38,6 +38,7 @@
                                 <th>Phone</th>
                                 <th>Price</th>
                                 <th>Status</th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -58,7 +59,7 @@
                                 <td th:unless="${offer.active}" th:text="Inactive"></td>
                                 <td>
                                     <a th:href="@{/rfav/{id}(id=${offer.id})}" class="btn btn-primary">
-                                        <i class="fas fa-heart-broken ml-2"></i>
+                                        <i class="fas fa-heart-broken"></i>
                                     </a>
                                 </td>
                             </tr>

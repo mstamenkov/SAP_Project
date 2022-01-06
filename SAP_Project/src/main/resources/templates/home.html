@@ -46,6 +46,7 @@
                                 <th>User</th>
                                 <th>Phone</th>
                                 <th>Price</th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -64,7 +65,7 @@
                                 <td>
                                     <a th:if="${offer.user != #httpServletRequest.remoteUser}"
                                        th:href="@{/favorite/{id}(id=${offer.id})}" class="btn btn-primary">
-                                        <i class="fas fa-heart ml-2"></i>
+                                        <i class="fas fa-heart"></i>
                                     </a>
                                 </td>
                             </tr>

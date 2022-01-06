@@ -57,8 +57,8 @@
                                 <td th:if="${offer.active}" th:text="Active"></td>
                                 <td th:unless="${offer.active}" th:text="Inactive"></td>
                                 <td>
-                                    <a th:href="@{/delete/{id}(id=${offer.id})}" class="btn btn-primary">
-                                        <i class="fas fa-trash ml-2"></i>
+                                    <a th:href="@{/delete/{id}(id=${offer.id})}" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i>
                                     </a>
                                 </td>
                             </tr>
