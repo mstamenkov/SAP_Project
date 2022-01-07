@@ -45,9 +45,10 @@ public class OfferService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void addOffer(Offer offer, Category categoryName) {
+    public void addOffer(Offer offer, Category categoryName) throws UserException {
         Category category = categoryRepo.getCategoryByName(categoryName.getCategoryName());
         User user = userRepo.findByUsername(servletRequest.getRemoteUser());
+        if(category == null)throw new UserException("No categories added. Contact system administrator");
         offer.setUser(servletRequest.getRemoteUser());
         offer.setDateOfCreation(new Date(System.currentTimeMillis()));
         offer.setDateOfExpiry(null);

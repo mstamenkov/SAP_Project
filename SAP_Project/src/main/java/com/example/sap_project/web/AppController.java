@@ -57,9 +57,14 @@ public class AppController {
     }
 
     @PostMapping("/create")
-    public String createOffer(Offer offerEntity, Category category) {
+    public String createOffer(Offer offerEntity, Category category, RedirectAttributes redirAttrs) {
         if (offerEntity.getUser().isEmpty()) {
-            offerService.addOffer(offerEntity, category);
+            try {
+                offerService.addOffer(offerEntity, category);
+            }catch (UserException e){
+                redirAttrs.addFlashAttribute("error",e.getMessage());
+                return "redirect:/home";
+            }
         } else {
             offerService.updateOffer(offerEntity);
         }
